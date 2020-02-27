@@ -12,7 +12,7 @@ import (
 )
 
 // DetectViewsDir 解决 go mod 模式无法注册 qor-admin 等包的 views
-func DetectViewsDir(pkgorg, pkgname string) string {
+func DetectViewsDir(pkgorg, pkgname, subpath string) string {
 
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
@@ -20,7 +20,7 @@ func DetectViewsDir(pkgorg, pkgname string) string {
 
 	}
 
-	if pkgname == "" {
+	if pkgname == "" && subpath == "" {
 		if filepath.IsAbs(pkgorg) {
 			return pkgorg
 		}
@@ -46,19 +46,32 @@ func DetectViewsDir(pkgorg, pkgname string) string {
 				return nil
 			}
 
-			if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
-				if vp := filepath.Join(p, "views"); isExistingDir(vp) {
-					foundp = vp
-					found = true
-				} else if cvp := filepath.Join(p, "providers/password/views"); isExistingDir(cvp) { // auth@
-				} else if cvp := filepath.Join(p, "asset_manager/views"); isExistingDir(cvp) { // media@
-				} else if cvp := filepath.Join(p, "media_library/views"); isExistingDir(cvp) { // media@
-					foundp = cvp
-					found = true
-				} else {
-					return err
+			//"media", /media_library,asset_manager
+			//"l10n",  /publish
+			//"i18n",  /exchange_actions, inline_edit
+			//"auth", /auth/providers/password ,facebook ,twitter
+			if pkgname != "" {
+				if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
+					if subpath == "" {
+						if vp := filepath.Join(p, "views"); isExistingDir(vp) {
+							foundp = vp
+							found = true
+						} else {
+							return err
+						}
+					} else if subpath != "" {
+						if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
+							if cvp := filepath.Join(p, subpath); isExistingDir(cvp) { // auth@
+								foundp = cvp
+								found = true
+							} else {
+								return err
+							}
+						}
+					}
 				}
 			}
+
 			return nil
 		}); err != nil {
 			color.Red(fmt.Sprintf("os.Stat2 error %v\n", err))
