@@ -50,7 +50,9 @@ func DetectViewsDir(pkgorg, pkgname string) string {
 				if vp := filepath.Join(p, "views"); isExistingDir(vp) {
 					foundp = vp
 					found = true
-				} else if cvp := filepath.Join(p, "providers/password/views"); isExistingDir(cvp) { // auth@/providers/password
+				} else if cvp := filepath.Join(p, "providers/password/views"); isExistingDir(cvp) { // auth@
+				} else if cvp := filepath.Join(p, "asset_manager/views"); isExistingDir(cvp) { // media@
+				} else if cvp := filepath.Join(p, "media_library/views"); isExistingDir(cvp) { // media@
 					foundp = cvp
 					found = true
 				} else {
