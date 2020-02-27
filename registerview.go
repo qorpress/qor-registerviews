@@ -53,7 +53,6 @@ func DetectViewsDir(pkgorg, pkgname, subpath string) string {
 					} else {
 						return err
 					}
-
 					if subpath != "" {
 						if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
 							if cvp := filepath.Join(p, subpath+"views"); isExistingDir(cvp) { // auth@
