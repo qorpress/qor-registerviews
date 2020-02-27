@@ -13,7 +13,6 @@ import (
 
 // DetectViewsDir 解决 go mod 模式无法注册 qor-admin 等包的 views
 func DetectViewsDir(pkgorg, pkgname, subpath string) string {
-
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
 		gopath = build.Default.GOPATH
@@ -46,20 +45,16 @@ func DetectViewsDir(pkgorg, pkgname, subpath string) string {
 				return nil
 			}
 
-			//"media", /media_library,asset_manager
-			//"l10n",  /publish
-			//"i18n",  /exchange_actions, inline_edit
-			//"auth", /auth/providers/password ,facebook ,twitter
 			if pkgname != "" {
 				if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
-					if subpath == "" {
-						if vp := filepath.Join(p, "views"); isExistingDir(vp) {
-							foundp = vp
-							found = true
-						} else {
-							return err
-						}
-					} else if subpath != "" {
+					if vp := filepath.Join(p, "views"); isExistingDir(vp) {
+						foundp = vp
+						found = true
+					} else {
+						return err
+					}
+
+					if subpath != "" {
 						if strings.HasPrefix(filepath.Base(p), pkgname+"@") {
 							if cvp := filepath.Join(p, subpath+"views"); isExistingDir(cvp) { // auth@
 								foundp = cvp
@@ -71,7 +66,6 @@ func DetectViewsDir(pkgorg, pkgname, subpath string) string {
 					}
 				}
 			}
-
 			return nil
 		}); err != nil {
 			color.Red(fmt.Sprintf("os.Stat2 error %v\n", err))
